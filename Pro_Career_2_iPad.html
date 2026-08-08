@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PRO CAREER 2.0</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#06101d;color:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.app{max-width:720px;margin:auto;padding:16px 14px 35px}.hero{padding:18px 4px 8px}.hero h1{font-size:32px;margin:0}.hero p{color:#8fa4bc;margin:5px 0 0}
+.card{background:#0d1c2e;border:1px solid #1d334d;border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 8px 25px #0004}
+input,select{width:100%;padding:15px;margin:6px 0;border-radius:13px;border:1px solid #29425f;background:#13263c;color:white;font-size:16px}
+button{width:100%;border:0;border-radius:14px;padding:16px;margin:6px 0;background:#20d58a;color:#04140d;font-size:16px;font-weight:800}
+button.alt{background:#203650;color:#fff}button.red{background:#c84759;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:#13283f;border-radius:14px;padding:11px}.stat small{color:#91a7be}.stat b{display:block;font-size:22px;margin-top:2px}
+.tag{display:inline-block;background:#173454;color:#bcd1e7;border-radius:20px;padding:6px 9px;font-size:12px;margin:3px 2px}
+.event{font-size:17px;line-height:1.45}.history{color:#9db0c6;font-size:14px;line-height:1.6}.hidden{display:none}
+.progress{height:8px;background:#172c42;border-radius:99px;overflow:hidden;margin-top:9px}.bar{height:100%;background:#20d58a;width:0}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hero"><h1>⚽ PRO CAREER 2.0</h1><p>Tu carrera. Tus decisiones. Tu legado.</p></div>
+
+<section id="setup" class="card">
+<h2>Crear futbolista</h2>
+<input id="name" placeholder="Nombre del jugador">
+<select id="pos"><option>Delantero</option><option>Extremo</option><option>Centrocampista</option><option>Defensa</option><option>Portero</option></select>
+<select id="club"><option>Málaga CF</option><option>Real Betis</option><option>Valencia CF</option><option>Sevilla FC</option><option>Villarreal</option><option>Real Sociedad</option><option>Athletic Club</option><option>Borussia Dortmund</option></select>
+<button id="start">🚀 EMPEZAR CARRERA</button>
+</section>
+
+<section id="game" class="hidden">
+<div class="card">
+<h2 id="player"></h2>
+<span class="tag" id="age"></span><span class="tag" id="clubTag"></span><span class="tag" id="posTag"></span>
+<div class="grid" id="stats"></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+</div>
+<div class="card">
+<h2 id="eventTitle">Temporada</h2>
+<div class="event" id="event"></div>
+<div id="choices"></div>
+</div>
+<div class="card">
+<h3>📜 Historial</h3><div class="history" id="history"></div>
+</div>
+<button class="alt" id="save">💾 Guardar partida</button>
+<button class="alt" id="new">🔄 Nueva carrera</button>
+</section>
+</div>
+
+<script>
+(function(){
+let p=null;
+const clubs=["Málaga CF","Real Betis","Valencia CF","Sevilla FC","Villarreal","Real Sociedad","Athletic Club","Borussia Dortmund","Atlético de Madrid","FC Barcelona","Real Madrid","Manchester City","Liverpool"];
+const $=id=>document.getElementById(id);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+
+function render(){
+ $("player").textContent=p.name;
+ $("age").textContent=p.age+" años";$("clubTag").textContent=p.club;$("posTag").textContent=p.pos;
+ $("stats").innerHTML=[
+ ["⭐ OVR",p.ovr],["⚽ Goles",p.goals],["🏆 Títulos",p.trophies],
+ ["💶 Dinero","€"+p.money.toLocaleString("es-ES")],["🔥 Fama",p.fame],["🩹 Lesión",p.inj? p.inj+" meses":"Sano"]
+ ].map(x=>`<div class="stat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join("");
+ $("bar").style.width=Math.min(100,Math.max(0,(p.ovr-40)/60*100))+"%";
+ $("history").innerHTML=p.log.slice(-10).reverse().map(x=>"• "+x).join("<br>")||"Tu historia empieza ahora.";
+}
+
+function start(){
+ p={name:$("name").value.trim()||"Jugador",pos:$("pos").value,club:$("club").value,age:16,ovr:rnd(55,67),goals:0,trophies:0,money:12000,fame:5,inj:0,season:1,log:[]};
+ localStorage.setItem("procareer",JSON.stringify(p));
+ $("setup").classList.add("hidden");$("game").classList.remove("hidden");render();event();
+}
+
+function event(){
+ if(p.age>=36){retire();return}
+ if(p.inj>0){$("eventTitle").textContent="🩹 Recuperación";$("event").textContent="Estás lesionado. Te quedan "+p.inj+" meses.";choices([["Continuar",finish]]);return}
+ const e=rnd(1,8);
+ if(e===1){$("eventTitle").textContent="🔥 Partido decisivo";$("event").textContent="Has marcado dos goles y los grandes clubes están mirando.";choices([["Ir a por el hat-trick",()=>{p.goals+=4;p.ovr+=3;p.fame+=5;log("Partido espectacular: +4 goles.");finish()}],["Jugar para el equipo",()=>{p.ovr+=2;p.fame+=3;log("Gran actuación colectiva.");finish()}]])}
+ if(e===2){let c=clubs[rnd(0,clubs.length-1)];while(c===p.club)c=clubs[rnd(0,clubs.length-1)];$("eventTitle").textContent="💰 Oferta de fichaje";$("event").textContent=c+" quiere ficharte. El proyecto promete mucho.";choices([["Aceptar el fichaje",()=>{p.club=c;p.ovr+=rnd(1,4);p.money+=rnd(50000,300000);p.fame+=6;log("Fichó por "+c+".");finish()}],["Quedarme",()=>{p.ovr+=2;p.money+=30000;log("Rechazó la oferta y se quedó.");finish()}]])}
+ if(e===3){$("eventTitle").textContent="🩼 Lesión";$("event").textContent="Te lesionas durante un entrenamiento.";choices([["Forzar la recuperación",()=>{p.inj=rnd(3,6);log("Forzó la recuperación y se perdió varios meses.");event()}],["Recuperarme bien",()=>{p.inj=rnd(1,3);log("Se recuperó con calma.");event()}]])}
+ if(e===4){$("eventTitle").textContent="🇪🇸 Selección";$("event").textContent="Recibes una convocatoria internacional.";choices([["Aceptar",()=>{p.goals+=rnd(1,4);p.fame+=8;log("Debutó con la selección.");finish()}],["Descansar",()=>{p.ovr+=1;log("Priorizó el club.");finish()}]])}
+ if(e===5){$("eventTitle").textContent="🗣️ Entrevista";$("event").textContent="La prensa te pregunta por un rival.";choices([["Provocar al rival",()=>{p.fame+=10;p.ovr+=1;log("Una entrevista polémica lo hizo viral.");finish()}],["Ser humilde",()=>{p.fame+=4;log("La prensa destacó su madurez.");finish()}]])}
+ if(e===6){$("eventTitle").textContent="🏆 Final";$("event").textContent="Tu equipo llega a una final. ¿Qué haces?";choices([["Asumir la responsabilidad",()=>{if(Math.random()<.65){p.trophies++;p.fame+=9;log("🏆 Ganó una final.");}else log("Perdió la final tras un partido dramático.");finish()}],["Jugar sin presión",()=>{p.trophies+=Math.random()<.45?1:0;p.fame+=3;log("Disfrutó de la final.");finish()}]])}
+ if(e===7){$("eventTitle").textContent="📈 Entrenamiento";$("event").textContent="Tienes una semana libre para mejorar.";choices([["Entrenar a tope",()=>{p.ovr+=rnd(2,5);p.money-=5000;log("Subió mucho su nivel.");finish()}],["Descansar",()=>{p.fame+=1;log("Descansó y volvió fresco.");finish()}]])}
+ if(e===8){$("eventTitle").textContent="💎 Renovación";$("event").textContent="Tu club quiere renovarte con un aumento.";choices([["Firmar",()=>{p.money+=rnd(60000,180000);p.fame+=2;log("Renovó contrato.");finish()}],["Esperar ofertas",()=>{p.fame+=4;log("Decidió esperar al mercado.");finish()}]])}
+ render();
+}
+
+function choices(arr){$("choices").innerHTML=arr.map((x,i)=>`<button id="c${i}">${x[0]}</button>`).join("");arr.forEach((x,i)=>$("c"+i).onclick=x[1])}
+function finish(){
+ if(p.inj>0){p.inj--;render();setTimeout(event,350);return}
+ p.age++;p.season++;p.goals+=rnd(6,28);p.money+=rnd(15000,160000);p.ovr+=rnd(0,3);
+ if(Math.random()<.10)p.inj=rnd(2,5);
+ localStorage.setItem("procareer",JSON.stringify(p));render();setTimeout(event,350);
+}
+function log(x){p.log.push("T"+p.season+": "+x)}
+function retire(){
+ $("eventTitle").textContent="👑 RETIRADA";$("event").textContent=`${p.name} se retira a los ${p.age} años. Terminó con ${p.goals} goles, ${p.trophies} títulos, OVR ${p.ovr} y fama ${p.fame}.`;
+ $("choices").innerHTML="<button id='restart'>🏁 Crear otra leyenda</button>";$("restart").onclick=()=>{localStorage.removeItem("procareer");location.reload()};
+ render();
+}
+$("start").onclick=start;
+$("save").onclick=()=>{localStorage.setItem("procareer",JSON.stringify(p));$("save").textContent="✅ Partida guardada";setTimeout(()=>$("save").textContent="💾 Guardar partida",1200)};
+$("new").onclick=()=>{localStorage.removeItem("procareer");location.reload()};
+const saved=localStorage.getItem("procareer");
+if(saved){try{p=JSON.parse(saved);$("setup").classList.add("hidden");$("game").classList.remove("hidden");render();event()}catch(e){localStorage.removeItem("procareer")}}
+})();
+</script>
+</body></html>
