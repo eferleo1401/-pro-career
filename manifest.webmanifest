@@ -1,0 +1,10 @@
+{
+  "name": "CopaPro Manager",
+  "short_name": "CopaPro",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "any",
+  "icons": []
+}

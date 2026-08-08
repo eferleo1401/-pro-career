@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>CopaPro — Manager</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#07111f;--panel:#0d1b2e;--panel2:#10233a;--line:#1d3550;--text:#eef6ff;--muted:#8fa6bd;--green:#25d366;--gold:#f5c451;--red:#ff5964}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#173c62 0,#07111f 45%);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh}
+button{font:inherit;border:0;color:inherit;cursor:pointer}.app{max-width:1500px;margin:auto;display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{background:rgba(7,17,31,.9);border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh}
+.logo{font-size:24px;font-weight:900;padding:8px 12px 25px}.logo span{color:var(--green)}
+.nav button{width:100%;background:transparent;text-align:left;padding:13px 14px;border-radius:11px;margin:3px 0;color:var(--muted)}
+.nav button.active,.nav button:hover{background:var(--panel2);color:#fff}.season{margin:28px 8px 0;padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:13px;font-size:12px;color:var(--muted)}
+.main{padding:22px 25px 100px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}.title h1{margin:0;font-size:30px}.title p{margin:5px 0;color:var(--muted)}
+.money{background:var(--panel);border:1px solid var(--line);padding:11px 15px;border-radius:12px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.card{background:linear-gradient(145deg,rgba(16,35,58,.96),rgba(10,25,42,.96));border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px #0003}.hero{grid-column:span 8;min-height:280px}.side{grid-column:span 4}.wide{grid-column:span 12}.half{grid-column:span 6}
+.kicker{color:var(--green);font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em}.score{font-size:55px;font-weight:950;margin:15px 0}.teams{display:flex;justify-content:space-between;align-items:center;gap:15px}.team{text-align:center;flex:1}.crest{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;background:#162d48;border:1px solid #31506e;font-size:25px;margin:auto auto 8px}.vs{color:var(--muted);font-weight:800}
+.btn{padding:11px 15px;border-radius:10px;background:#18334e;border:1px solid #2a4d6d}.btn.primary{background:var(--green);color:#03120a;font-weight:900}.btn.gold{background:var(--gold);color:#1b1400;font-weight:900}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 8px;border-bottom:1px solid var(--line);text-align:left}.table th{color:var(--muted);font-size:12px}.badge{padding:5px 8px;border-radius:8px;background:#17334d;font-size:12px}.good{color:var(--green)}.goldtxt{color:var(--gold)}.muted{color:var(--muted)}
+.progress{height:9px;background:#081523;border-radius:99px;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:var(--green);width:68%}
+.event{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.event:last-child{border:0}.dot{width:10px;height:10px;border-radius:50%;background:var(--gold);margin-top:6px}
+.mobilebar{display:none}
+@media(max-width:900px){.app{display:block}.sidebar{display:none}.main{padding:16px 13px 88px}.hero,.side,.wide,.half{grid-column:span 12}.top{align-items:flex-start}.title h1{font-size:24px}.money{font-size:13px}.mobilebar{display:flex;position:fixed;z-index:20;bottom:0;left:0;right:0;background:#091525f2;border-top:1px solid var(--line);backdrop-filter:blur(12px);padding:8px 6px;justify-content:space-around}.mobilebar button{background:transparent;color:var(--muted);font-size:11px}.mobilebar button.active{color:#fff}.mobilebar b{display:block;font-size:19px;margin-bottom:2px}}
+@media(max-width:500px){.score{font-size:42px}.card{padding:14px}.teams{gap:7px}.crest{width:52px;height:52px}.table th,.table td{padding:9px 4px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">Copa<span>Pro</span></div>
+  <nav class="nav">
+    <button class="active" onclick="show('inicio',this)">🏠 Inicio</button>
+    <button onclick="show('plantilla',this)">👥 Plantilla</button>
+    <button onclick="show('mercado',this)">💰 Mercado</button>
+    <button onclick="show('competiciones',this)">🏆 Competiciones</button>
+    <button onclick="show('club',this)">🏟️ Mi club</button>
+  </nav>
+  <div class="season">TEMPORADA 2026/27<br><strong>Objetivo: entrar en Europa</strong></div>
+</aside>
+
+<main class="main">
+<header class="top">
+  <div class="title"><h1 id="pageTitle">Centro del club</h1><p id="subtitle">Tu próxima decisión puede cambiar la temporada.</p></div>
+  <div class="money">💶 <span id="budget">42.5M</span></div>
+</header>
+
+<section id="inicio" class="page">
+<div class="grid">
+  <article class="card hero">
+    <div class="kicker">Próximo partido · Liga</div>
+    <h2>Jornada 8</h2>
+    <div class="teams">
+      <div class="team"><div class="crest">🔵</div><b>MAKAGA CF</b></div>
+      <div class="vs">VS<br><small class="muted">Dom 20:00</small></div>
+      <div class="team"><div class="crest">⚪</div><b>SEVILLA B</b></div>
+    </div>
+    <div class="actions"><button class="btn primary" onclick="simulate()">⚡ Jugar partido</button><button class="btn" onclick="alert('Entrenamiento programado: presión alta + definición.')">🎯 Entrenar</button></div>
+  </article>
+  <article class="card side">
+    <div class="kicker">Clasificación</div><h2>#5 · 13 pts</h2>
+    <p class="muted">Europa League</p><div class="progress"><i style="width:72%"></i></div>
+    <p>Forma: <b class="good">🟢 🟢 🟡 🟢 🟢</b></p>
+  </article>
+  <article class="card half">
+    <div class="kicker">Noticias</div>
+    <div class="event"><span class="dot"></span><div><b>Cantera</b><br><span class="muted">El juvenil Mateo sube a 67 de valoración.</span></div></div>
+    <div class="event"><span class="dot"></span><div><b>Mercado</b><br><span class="muted">Tres clubes preguntan por tu delantero.</span></div></div>
+  </article>
+  <article class="card half">
+    <div class="kicker">Palmarés</div>
+    <h2>🏆 3</h2><p class="muted">Trofeos del club</p>
+    <div class="actions"><button class="btn gold" onclick="alert('Objetivo desbloqueado: conquistar la Copa.')">Ver objetivos</button></div>
+  </article>
+</div>
+</section>
+
+<section id="plantilla" class="page" hidden>
+<div class="card wide"><div class="kicker">Primer equipo</div><h2>Plantilla</h2>
+<table class="table"><thead><tr><th>Jugador</th><th>Pos.</th><th>OVR</th><th>Valor</th><th>Estado</th></tr></thead><tbody>
+<tr><td>Álex Romero</td><td>POR</td><td>79</td><td>18M</td><td class="good">Disponible</td></tr>
+<tr><td>Javi Torres</td><td>DFC</td><td>77</td><td>14M</td><td class="good">Disponible</td></tr>
+<tr><td>Lucas Vega</td><td>MC</td><td>82</td><td>31M</td><td class="goldtxt">🔥 Forma</td></tr>
+<tr><td>Adrián Soler</td><td>ED</td><td>80</td><td>24M</td><td class="good">Disponible</td></tr>
+<tr><td>Mateo Ruiz</td><td>DC</td><td>74</td><td>9M</td><td class="muted">Rotación</td></tr>
+</tbody></table></div></section>
+
+<section id="mercado" class="page" hidden>
+<div class="grid"><article class="card wide"><div class="kicker">Mercado de fichajes</div><h2>Oportunidades</h2>
+<table class="table"><thead><tr><th>Jugador</th><th>Pos.</th><th>OVR</th><th>Precio</th><th></th></tr></thead><tbody>
+<tr><td>Bruno Costa</td><td>MC</td><td>78</td><td>12M</td><td><button class="btn" onclick="buy(12,'Bruno Costa')">Fichar</button></td></tr>
+<tr><td>Daniel Marín</td><td>LI</td><td>76</td><td>8M</td><td><button class="btn" onclick="buy(8,'Daniel Marín')">Fichar</button></td></tr>
+<tr><td>Iván Pardo</td><td>DC</td><td>81</td><td>27M</td><td><button class="btn" onclick="buy(27,'Iván Pardo')">Fichar</button></td></tr>
+</tbody></table></article></div></section>
+
+<section id="competiciones" class="page" hidden>
+<div class="grid">
+<article class="card half"><div class="kicker">Liga</div><h2>5º</h2><p>13 puntos · 7 jornadas</p><div class="progress"><i style="width:65%"></i></div></article>
+<article class="card half"><div class="kicker">Copa</div><h2>Octavos</h2><p>Próximo rival: Cádiz</p><button class="btn primary" onclick="alert('Sorteo: Makaga CF vs Cádiz')">Ver cuadro</button></article>
+<article class="card wide"><div class="kicker">Europa League</div><h2>Fase de liga</h2><p class="muted">Grupo generado dinámicamente en esta demo.</p></article>
+</div></section>
+
+<section id="club" class="page" hidden>
+<div class="grid"><article class="card half"><div class="kicker">Estadio</div><h2>La Costa Arena</h2><p>32.400 espectadores</p><button class="btn" onclick="upgrade()">Mejorar estadio · 6M</button></article>
+<article class="card half"><div class="kicker">Cantera</div><h2>⭐ Nivel 4</h2><p>2 ojeadores activos</p><button class="btn" onclick="alert('Nuevo juvenil encontrado: extremo de 16 años, potencial 86.')">Buscar talento</button></article></div></section>
+</main>
+</div>
+
+<div class="mobilebar">
+<button class="active" onclick="show('inicio',this)">🏠<b>Inicio</b></button>
+<button onclick="show('plantilla',this)">👥<b>Equipo</b></button>
+<button onclick="show('mercado',this)">💰<b>Mercado</b></button>
+<button onclick="show('competiciones',this)">🏆<b>Copa</b></button>
+<button onclick="show('club',this)">🏟️<b>Club</b></button>
+</div>
+
+<script>
+let budget=42.5;
+const titles={inicio:['Centro del club','Tu próxima decisión puede cambiar la temporada.'],plantilla:['Plantilla','Gestiona tu once y la profundidad del equipo.'],mercado:['Mercado','Fichajes, ventas y oportunidades.'],competiciones:['Competiciones','Liga, Copa y Europa.'],club:['Mi club','Estadio, cantera y evolución.']};
+function show(id,btn){document.querySelectorAll('.page').forEach(x=>x.hidden=true);document.getElementById(id).hidden=false;document.querySelectorAll('.nav button,.mobilebar button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('[onclick*="'+id+'"]').forEach(x=>x.classList.add('active'));document.getElementById('pageTitle').textContent=titles[id][0];document.getElementById('subtitle').textContent=titles[id][1];scrollTo({top:0,behavior:'smooth'})}
+function buy(price,name){if(budget<price){alert('No tienes suficiente presupuesto.');return}budget-=price;document.getElementById('budget').textContent=budget.toFixed(1)+'M';alert('¡Fichaje completado! '+name+' se une al club.')}
+function upgrade(){if(budget<6){alert('Presupuesto insuficiente.');return}budget-=6;document.getElementById('budget').textContent=budget.toFixed(1)+'M';alert('Estadio mejorado. +2.000 localidades.')}
+function simulate(){let win=Math.random()>.38;alert(win?'🔥 ¡Victoria! Makaga CF 2 - 1 Sevilla B':'😬 Empate. Makaga CF 1 - 1 Sevilla B');}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body></html>
